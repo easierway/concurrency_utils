@@ -30,8 +30,7 @@ func (rs *ResultStub) GetResult() TaskResult {
 	timer := time.NewTimer(time.Millisecond * time.Duration(rs.timeoutMs))
 	select {
 	case ret := <-rs.retCh:
-		tResult.Result = ret
-		return tResult
+		return ret
 	case <-timer.C:
 		tResult.Err = ErrTimeout
 		return tResult

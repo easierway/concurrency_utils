@@ -27,7 +27,7 @@ func TestHappyPath(t *testing.T) {
 	if time.Since(startTime).Microseconds() < 3000 {
 		t.Error("It is not unexpected execution time.")
 	}
-	fmt.Println(ret.Result)
+	fmt.Println(ret.Result.(string), ret.Err)
 }
 
 func TestTimeoutPath(t *testing.T) {
