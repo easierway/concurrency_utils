@@ -18,6 +18,7 @@ type TaskResult struct {
 // ResultStub is returned immediately after calling AsynExecutor
 // It is the stub to get the result.
 type ResultStub struct {
+	tResult   *TaskResult
 	retCh     chan TaskResult
 	timeoutMs int64
 	ctx       context.Context
@@ -26,19 +27,23 @@ type ResultStub struct {
 // GetResult is to get the asynchronous task's result
 // it will be blocked util the task is completed/failed.
 func (rs *ResultStub) GetResult() TaskResult {
-	var tResult TaskResult
-	timer := time.NewTimer(time.Millisecond * time.Duration(rs.timeoutMs))
-	select {
-	case ret := <-rs.retCh:
-		return ret
-	case <-timer.C:
-		tResult.Err = ErrTimeout
-		return tResult
-	case <-rs.ctx.Done():
-		tResult.Err = ErrCancelled
-		return tResult
+	if rs.tResult == nil {
+		var tResult TaskResult
+		timer := time.NewTimer(time.Millisecond * time.Duration(rs.timeoutMs))
+		select {
+		case ret := <-rs.retCh:
+			rs.tResult = &ret
+		case <-timer.C:
+			tResult.Err = ErrTimeout
+			rs.tResult = &tResult
+		case <-rs.ctx.Done():
+			tResult.Err = ErrCancelled
+			rs.tResult = &tResult
+		}
+		return *rs.tResult
+	} else {
+		return *rs.tResult
 	}
-	return tResult
 }
 
 type Task func(ctx context.Context) TaskResult
@@ -53,5 +58,7 @@ func AsynExecutor(ctx context.Context, task Task,
 	go func() {
 		retCh <- task(ctx)
 	}()
-	return ResultStub{retCh, timeoutMs, ctx}
+	return ResultStub{retCh: retCh,
+		timeoutMs: timeoutMs,
+		ctx:       ctx}
 }
