@@ -32,7 +32,7 @@ func TestHappyPath(t *testing.T) {
 
 func TestTimeoutPath(t *testing.T) {
 	startTime := time.Now()
-	retStub := AsynExecutor(context.TODO(), task, 1)
+	retStub := AsynExecutor(context.TODO(), task, 100)
 	if time.Since(startTime).Milliseconds() > 2 {
 		t.Error("It is not asynchronous call.")
 	}

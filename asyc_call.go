@@ -27,23 +27,22 @@ type ResultStub struct {
 // GetResult is to get the asynchronous task's result
 // it will be blocked util the task is completed/failed.
 func (rs *ResultStub) GetResult() TaskResult {
-	if rs.tResult == nil {
-		var tResult TaskResult
-		timer := time.NewTimer(time.Millisecond * time.Duration(rs.timeoutMs))
-		select {
-		case ret := <-rs.retCh:
-			rs.tResult = &ret
-		case <-timer.C:
-			tResult.Err = ErrTimeout
-			rs.tResult = &tResult
-		case <-rs.ctx.Done():
-			tResult.Err = ErrCancelled
-			rs.tResult = &tResult
-		}
-		return *rs.tResult
-	} else {
+	if rs.tResult != nil {
 		return *rs.tResult
 	}
+	var tResult TaskResult
+	timer := time.NewTimer(time.Millisecond * time.Duration(rs.timeoutMs))
+	select {
+	case ret := <-rs.retCh:
+		rs.tResult = &ret
+	case <-timer.C:
+		tResult.Err = ErrTimeout
+		rs.tResult = &tResult
+	case <-rs.ctx.Done():
+		tResult.Err = ErrCancelled
+		rs.tResult = &tResult
+	}
+	return *rs.tResult
 }
 
 type Task func(ctx context.Context) TaskResult
