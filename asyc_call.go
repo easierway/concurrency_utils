@@ -13,6 +13,7 @@ var ErrCancelled = errors.New("task has been cancelled")
 type TaskResult struct {
 	Result interface{}
 	Err    error
+	CostMs int64
 }
 
 // ResultStub is returned immediately after calling AsynExecutor
