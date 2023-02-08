@@ -41,9 +41,9 @@ func (stub *AnyResultStub) GetResultWhenAnyTaskReturns() TaskResult {
 	case ret := <-stub.retCh:
 		stub.firstReturn = &ret
 	case <-stub.timer.C:
-		stub.firstReturn = &TaskResult{nil, ErrTimeout}
+		stub.firstReturn = &TaskResult{nil, ErrTimeout, 0}
 	case <-stub.ctx.Done():
-		stub.firstReturn = &TaskResult{nil, ErrCancelled}
+		stub.firstReturn = &TaskResult{nil, ErrCancelled, 0}
 	}
 	return *stub.firstReturn
 

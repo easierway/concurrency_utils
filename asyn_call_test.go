@@ -10,7 +10,7 @@ import (
 
 var task = func(ctx context.Context) TaskResult {
 	time.Sleep(time.Second * 3)
-	return TaskResult{"OK", nil}
+	return TaskResult{"OK", nil, 0}
 }
 
 func TestHappyPath(t *testing.T) {
