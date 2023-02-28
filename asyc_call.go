@@ -13,15 +13,19 @@ var ErrCancelled = errors.New("task has been cancelled")
 type TaskResult struct {
 	Result interface{}
 	Err    error
+	// for the need for record perf metric
+	CostMs int64
 }
 
 // ResultStub is returned immediately after calling AsynExecutor
 // It is the stub to get the result.
 type ResultStub struct {
 	tResult   *TaskResult
-	retCh     chan TaskResult
+	retCh     <-chan TaskResult
 	timeoutMs int64
 	ctx       context.Context
+	// for some async framework, which returns channel erro
+	errChan chan error
 }
 
 // GetResult is to get the asynchronous task's result
@@ -40,6 +44,8 @@ func (rs *ResultStub) GetResult() TaskResult {
 		rs.tResult = &tResult
 	case <-rs.ctx.Done():
 		tResult.Err = ErrCancelled
+		rs.tResult = &tResult
+	case tResult.Err = <-rs.errChan:
 		rs.tResult = &tResult
 	}
 	return *rs.tResult
