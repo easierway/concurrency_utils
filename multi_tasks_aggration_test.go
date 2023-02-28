@@ -10,21 +10,21 @@ import (
 var task1 Task = func(ctx context.Context) TaskResult {
 	time.Sleep(time.Second * 2)
 	return TaskResult{
-		"Task1", nil,
+		Result: "Task1", Err: nil,
 	}
 }
 
 var task2 Task = func(ctx context.Context) TaskResult {
 	time.Sleep(time.Second * 1)
 	return TaskResult{
-		"Task2", nil,
+		Result: "Task2", Err: nil,
 	}
 }
 
 var task3 Task = func(ctx context.Context) TaskResult {
 	time.Sleep(time.Second * 3)
 	return TaskResult{
-		"Task3", nil,
+		Result: "Task3", Err: nil,
 	}
 }
 
